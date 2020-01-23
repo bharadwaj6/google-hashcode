@@ -1,5 +1,26 @@
+from collections import defaultdict
+
+
 class Solution:
+    def get_best_greedy(self, M, N, sizes):
+        mapping = defaultdict(list)
+        for i, s in enumerate(sizes):
+            mapping[s].append(i)
+        
+        sizes = sorted(sizes)
+        total = 0
+        added = []
+        for size in sizes[::-1]:
+            if total + size <= M:
+                idx = mapping[size].pop()
+                added.append(idx)
+                total += size
+        return added[::-1]
+    
     def get_pizzas(self, M, N, sizes):
+        if M > 100000:
+            return self.get_best_greedy(M, N, sizes)
+        
         dp = [[0] * (M + 1) for _ in range(N + 1)]
         for i in range(1, N + 1):
             for j in range(1, M + 1):
