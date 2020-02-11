@@ -1,26 +1,52 @@
+import copy
+import random
 from collections import defaultdict
+
+RANDOM_TIMES = 5000
 
 
 class Solution:
-    def get_best_greedy(self, M, N, sizes):
-        mapping = defaultdict(list)
-        for i, s in enumerate(sizes):
-            mapping[s].append(i)
-        
-        sizes = sorted(sizes)
-        total = 0
-        added = []
-        for size in sizes[::-1]:
+    def get_best(self, sizes):
+        mapping = copy.deepcopy(self.mapping)
+        new_sizes = copy.deepcopy(sizes)
+        random.shuffle(new_sizes)
+
+        total, added = 0, []
+        for size in new_sizes:
             if total + size <= M:
                 idx = mapping[size].pop()
                 added.append(idx)
                 total += size
-        return added[::-1]
-    
+        del mapping
+        del new_sizes
+        return total, added[::-1]
+
+    def normal_best(self):
+        best1, idxs1 = self.get_best(sizes)
+        best2, idxs2 = self.get_best(sizes[::-1])
+        return (best1, idxs1) if best1 > best2 else (best2, idxs2)
+
+    def get_best_greedy(self, sizes):
+        self.mapping = defaultdict(list)
+        for i, s in enumerate(sizes):
+            self.mapping[s].append(i)
+
+        # randomized algorithm, shuffle and iterate for 10 iterations
+        best, ret = self.normal_best()
+        for k in range(RANDOM_TIMES):
+            if k % 100 == 0:
+                print('shuffling: ', k)
+            res, idxs = self.get_best(sizes)
+            if res > best:
+                print('found better score: ', res)
+                best = res
+                ret = idxs
+        return ret
+
     def get_pizzas(self, M, N, sizes):
         if M > 100000:
-            return self.get_best_greedy(M, N, sizes)
-        
+            return self.get_best_greedy(sizes)
+
         dp = [[0] * (M + 1) for _ in range(N + 1)]
         for i in range(1, N + 1):
             for j in range(1, M + 1):
@@ -46,7 +72,6 @@ class Solution:
 
 s = Solution()
 print(s.get_pizzas(17, 4, [2, 5, 6, 8]))
-
 
 filenames = ['a_example.in', 'b_small.in', 'c_medium.in', 'd_quite_big.in', 'e_also_big.in']
 outputs = ['a.output', 'b.output', 'c.output', 'd.output', 'e.output']
