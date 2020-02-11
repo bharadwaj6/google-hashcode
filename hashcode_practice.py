@@ -2,7 +2,7 @@ import copy
 import random
 from collections import defaultdict
 
-RANDOM_TIMES = 5000
+RANDOM_TIMES = 200000
 
 
 class Solution:
