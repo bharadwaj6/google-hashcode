@@ -7,28 +7,37 @@ BOOK_IDS = 'book_ids'
 
 
 class Solution:
-    def order_books(self, input_file):
-        with open('input/' + input_file) as f:
+    def __init__(self, input_file):
+        self.input_file = input_file
+        self.output_file = 'output/' + self.input_file.replace('in', 'out')
+        with open('input/' + self.input_file) as f:
             lines = f.readlines()
-            B, L, D = [int(x) for x in lines[0].split()]
-            book_scores = [int(x) for x in lines[1].split()]
-            libraries = defaultdict(dict)
+            self.B, self.L, self.D = [int(x) for x in lines[0].split()]
+            self.book_scores = [int(x) for x in lines[1].split()]
+            self.libraries = defaultdict(dict)
             ctr = 2
-            for l in range(L):
-                libraries[l][NO_BOOKS], libraries[l][NO_DAYS], libraries[l][SHIP_BOOKS] = [int(x) for x in lines[ctr].split()]
-                libraries[l][BOOK_IDS] = [int(x) for x in lines[ctr+1].split()]
+            for l in range(self.L):
+                self.libraries[l][NO_BOOKS], self.libraries[l][NO_DAYS], self.libraries[l][SHIP_BOOKS] = [int(x) for x in lines[ctr].split()]
+                self.libraries[l][BOOK_IDS] = [int(x) for x in lines[ctr+1].split()]
                 ctr += 2
+    
+    def order_books(self):
+        # approach 1 - simple one by one in given order
+        return self.libraries
 
-            # approach 1 - simple one by one in given order
-            res = []
-            res.append(str(len(libraries)))
-            for l, vals in libraries.items():
-                bookids = vals[BOOK_IDS]
-                res.append(' '.join([str(l), str(len(bookids))]))
-                res.append(' '.join([str(x) for x in bookids]))
-            with open('output/' + input_file.replace('in', 'out'), 'w') as f:
-                f.write('\n'.join(res))
+    def get_schedule(self, ):
+        out_libaries = self.order_books()
+        
+        res = [str(len(out_libaries))]
+        for l, vals in out_libaries.items():
+            bookids = vals[BOOK_IDS]
+            res.append(' '.join([str(l), str(len(bookids))]))
+            res.append(' '.join([str(x) for x in bookids]))
+        
+        with open(self.output_file, 'w') as f:
+            f.write('\n'.join(res))
 
-s = Solution()
+
 for fname in ['a','b','c','d','e','f']:
-    s.order_books(fname + '.in')
+    s = Solution(fname + '.in')
+    s.get_schedule()
